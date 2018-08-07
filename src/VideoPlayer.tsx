@@ -17,6 +17,8 @@ const noop: () => void = () => {};
 interface Props {
   source: string;
   autoStart: boolean;
+  loop: boolean;
+  resizeMode: 'none' | 'contain' | 'cover' | 'stretch';
 
   loader: React.ReactNode;
   middleControlsBar: React.ReactNode;
@@ -49,6 +51,7 @@ export default class VideoPlayer extends React.PureComponent<Props, State> {
     // Metadata
     source: PropTypes.string.isRequired,
     autoStart: PropTypes.bool,
+    loop: PropTypes.bool,
 
     // Customisable components
     loader: PropTypes.node, // Loader component
@@ -67,6 +70,7 @@ export default class VideoPlayer extends React.PureComponent<Props, State> {
 
   static defaultProps = {
     autoStart: true,
+    loop: false,
     onError: noop,
     onProgress: noop,
     onEnd: noop
@@ -77,6 +81,7 @@ export default class VideoPlayer extends React.PureComponent<Props, State> {
   public controlsHider: number;
   public toggleControls: () => void;
   public setPosition: (position: number) => void;
+  public toggleFullscreen: () => void;
   public setNotLoading: () => void;
   public setPlaying: () => void;
   public setPaused: () => void;
@@ -107,6 +112,10 @@ export default class VideoPlayer extends React.PureComponent<Props, State> {
       this.player.seek(position);
       this.setState({ currentTime: position });
     };
+    this.toggleFullscreen = () => {
+      console.log('go fullscreen');
+      this.player.presentFullscreenPlayer();
+    }
     this.setNotLoading = () => this.setState({ isLoading: false });
     this.setPlaying = () => this.setState({ isPaused: false });
     this.setPaused = () => this.setState({ isPaused: true });
@@ -202,6 +211,8 @@ export default class VideoPlayer extends React.PureComponent<Props, State> {
       bottomControlsBarProps,
       bottomControlsBar,
       source,
+      loop,
+      resizeMode,
       onError
     } = this.props;
 
@@ -226,7 +237,8 @@ export default class VideoPlayer extends React.PureComponent<Props, State> {
       isPaused,
       setPlaying: this.setPlaying,
       setPaused: this.setPaused,
-      setPosition: this.setPosition
+      setPosition: this.setPosition,
+      toggleFullscreen: this.toggleFullscreen,
     };
 
     return (
@@ -256,8 +268,9 @@ export default class VideoPlayer extends React.PureComponent<Props, State> {
             ref={player => (this.player = player)}
             source={{ uri: source }}
             style={styles.backgroundVideo}
-            resizeMode="contain"
+            resizeMode={resizeMode || "contain"}
             paused={isPaused}
+            loop={loop}
             onError={onError}
             onLoad={this.onLoad}
             onProgress={this.onProgress}
@@ -272,7 +285,8 @@ export default class VideoPlayer extends React.PureComponent<Props, State> {
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
-    justifyContent: "center"
+    justifyContent: "center",
+    backgroundColor: "black",
   },
   controls: {
     ...StyleSheet.absoluteFillObject,

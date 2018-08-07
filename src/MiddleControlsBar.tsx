@@ -4,14 +4,16 @@ import * as PropTypes from 'prop-types'
 
 import PlayerIcon from './PlayerIcon'
 
-import { playerPlay, playerPause, playerRestart } from "./images/index"
+import { playerPlay, playerPause, playerRestart, playerFullscreen } from "./images/index"
 
 interface Props {
   isPaused: boolean;
   restartButton?: boolean;
+  fullscreenButton?: boolean;
   setPlaying(): void;
   setPaused(): void;
   setPosition(position: number): void;
+  toggleFullscreen(): void;
 }
 
 export default class MiddleControlsBar extends React.PureComponent<Props, null>{
@@ -19,6 +21,7 @@ export default class MiddleControlsBar extends React.PureComponent<Props, null>{
     // Metadata
     isPaused: PropTypes.bool.isRequired,
     restartButton: PropTypes.bool,
+    fullscreenButton: PropTypes.bool,
 
     // Controls
     setPlaying: PropTypes.func.isRequired, // Trigger play action
@@ -27,15 +30,18 @@ export default class MiddleControlsBar extends React.PureComponent<Props, null>{
   }
 
   static defaultProps = {
-    restartButton: true
+    restartButton: true,
+    fullscreenButton: false,
   }
 
   public restartVideo
+  public toggleFullscreen
 
   constructor(props) {
     super(props)
 
     this.restartVideo = () => this.props.setPosition(0)
+    this.toggleFullscreen = () => this.props.toggleFullscreen()
   }
 
   render() {
@@ -48,6 +54,9 @@ export default class MiddleControlsBar extends React.PureComponent<Props, null>{
           )}
         {this.props.restartButton && (
           <PlayerIcon iconSource={playerRestart} onPress={this.restartVideo} />
+        )}
+        {this.props.fullscreenButton && (
+          <PlayerIcon iconSource={playerFullscreen} onPress={this.toggleFullscreen} />
         )}
       </View>
     )
